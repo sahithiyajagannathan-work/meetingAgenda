@@ -507,30 +507,30 @@ async function generate(customPrompt) {
   const userMsg = prompt || `Generate a professional event description for: ${document.getElementById('name').value || 'this meeting'}`;
 
   try {
-    const res = await fetch('https://platformai.zoho.in/playground/v2/ai/chat', {
+    const res = await fetch('https://lawrancejt-q1tgyq44-3000.zcodecorp.in/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'portal_id': 'PlatformAI',
-        'service': '193',
-        'service_org_id': 'PlatformAI',
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        context: sys,
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: sys,
         messages: [{ role: 'user', content: userMsg }],
-        ai_vendor: 'zia',
-        model: 'zlabs-qwen3-4B-v1',
       }),
     });
 
     const data = await res.json();
 
-    if (!res.ok || !data.data?.results?.[0]) {
-      throw new Error(data.error || 'Generation failed');
+    if (!res.ok) {
+      throw new Error(data.error?.message || 'Generation failed');
     }
 
-    state.description = data.data.results[0];
+    const text = data.content?.map(b => b.text || '').join('\n') || '';
+    if (!text) throw new Error('Empty response');
+
+    state.description = text;
     state.generated = true;
     state.aiMode = false;
 
