@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoho Meeting — Create Event Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:#111;color:#e0e0e0;min-height:100vh;padding:24px 16px}
+input,textarea,button,select{font-family:inherit}
+
+.card{max-width:620px;margin:0 auto;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;overflow:hidden}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-bottom:1px solid #2A2A2A}
+.hdr-t{font-size:14px;color:#ccc}
+.hdr-t span{color:#666}
+.body{padding:20px 24px}
+
+.row{display:flex;align-items:flex-start;margin-bottom:18px}
+.lbl{width:110px;min-width:110px;font-size:13px;color:#888;padding-top:8px}
+.fld{flex:1}
+
+.inp{width:100%;border:1px solid #333;border-radius:4px;padding:7px 10px;font-size:13px;color:#ddd;background:#222;outline:none}
+.inp::placeholder{color:#666}
+.lnk{color:#E8413C;font-size:12px;cursor:pointer}
+
+.tag{font-size:11px;padding:3px 8px;border-radius:12px;background:#2A2A2A;color:#ccc;border:1px solid #333;display:inline-flex;align-items:center;gap:4px;margin:0 4px 4px 0}
+.tag .x{cursor:pointer;color:#888;font-weight:700}
+
+.toggle-wrap{display:flex;justify-content:center;gap:8px;margin-bottom:6px}
+.toggle-btn{padding:7px 20px;font-size:12px;cursor:pointer;border:1px solid #333;border-radius:4px;background:#1A1A1A;color:#888;font-family:inherit}
+.toggle-btn.on{border-color:#E8413C;color:#fff;font-weight:600}
+
+.mode-wrap{display:flex}
+.mode-btn{padding:5px 16px;font-size:12px;cursor:pointer;border:1px solid #333;color:#888;background:transparent;font-family:inherit}
+.mode-btn.on{border-color:#E8413C;background:#E8413C;color:#fff}
+.mode-btn:first-child{border-radius:4px 0 0 4px}
+.mode-btn:last-child{border-radius:0 4px 4px 0}
+
+.radio{width:14px;height:14px;border-radius:50%;border:2px solid #555;display:inline-block;vertical-align:middle;cursor:pointer}
+.radio.on{border:4px solid #E8413C}
+
+.desc-box{border:1px solid #333;border-radius:4px;background:#222;overflow:hidden}
+.tb{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid #2A2A2A;background:#1E1E1E}
+.tb-btn{border:none;background:none;padding:4px 10px;cursor:pointer;font-size:15px;border-radius:3px;line-height:1;color:#999}
+.tb-btn.off{color:#444;cursor:default}
+.tb-actions{display:flex;gap:6px}
+
+.zia{border:none;background:#E8413C;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:11px;color:#fff;display:inline-flex;align-items:center;gap:5px;font-weight:500;white-space:nowrap;font-family:inherit}
+.btn-out{border:1px solid #444;background:transparent;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;color:#ccc;white-space:nowrap;font-family:inherit}
+
+.ai-panel{padding:14px;background:#261616}
+.ai-ctx{font-size:11px;color:#777;margin-bottom:12px;line-height:1.6}
+.ai-ctx span{color:#aaa}
+.ai-prompt-row{display:flex;gap:8px;align-items:stretch}
+.ai-prompt{flex:1;border:1px solid #444;border-radius:4px;padding:8px 10px;font-size:12px;resize:none;height:52px;color:#ddd;background:#1A1A1A;font-family:inherit}
+.ai-prompt::placeholder{color:#666}
+
+.qchip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+.qchip{font-size:11px;padding:3px 10px;border-radius:12px;background:transparent;color:#E8413C;border:1px solid #5C2A2A;cursor:pointer;display:inline-block}
+.qchip:hover{background:#3A2222}
+
+.desc-content{padding:12px}
+.desc-ta{width:100%;border:none;background:transparent;color:#ddd;font-size:13px;resize:vertical;outline:none;line-height:1.7;font-family:inherit}
+.desc-rich{width:100%;min-height:100px;border:none;background:transparent;color:#ddd;font-size:13px;outline:none;line-height:1.8;white-space:pre-wrap}
+.desc-rich strong{color:#fff}
+.zia-footer{margin-top:6px;padding-top:8px;border-top:1px solid #2A2A2A;display:flex;align-items:center;gap:5px}
+
+.ftr{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;border-top:1px solid #2A2A2A}
+.btn-cancel{padding:7px 22px;border:1px solid #333;border-radius:4px;background:transparent;color:#ccc;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-create{padding:7px 22px;border:none;border-radius:4px;background:#E8413C;color:#fff;font-size:13px;cursor:pointer;font-weight:600;font-family:inherit}
+
+.err{font-size:11px;color:#E8413C;margin-top:6px}
+.sub{font-size:11px;color:#555;margin-top:2px}
+.dur{font-size:11px;color:#4A90D9;margin-top:4px}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-t"><span>All Events › </span><b>Create Event</b></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="width:8px;height:8px;background:#4CAF50;border-radius:2px;display:inline-block"></span>
+      <span style="font-size:12px;color:#666">sahithiya.j</span>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Meeting Type -->
+    <div class="toggle-wrap">
+      <button class="toggle-btn" data-type="f2f" onclick="setMeetingType('f2f')">📍 Face to Face</button>
+      <button class="toggle-btn on" data-type="online" onclick="setMeetingType('online')">📞 Online Meeting</button>
+    </div>
+    <p style="text-align:center;font-size:11px;color:#555;margin-bottom:22px" id="typeDesc">Real-time interaction between remotely located users.</p>
+
+    <!-- Name -->
+    <div class="row">
+      <div class="lbl">Name *</div>
+      <div class="fld"><input class="inp" id="name" value="Zylker Marketing Openhouse" oninput="updateTemplates()"></div>
+    </div>
+
+    <!-- Date & Time -->
+    <div class="row">
+      <div class="lbl">Date & Time</div>
+      <div class="fld">
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="datetime-local" class="inp" id="startTime" style="flex:1" onchange="updateDuration()">
+          <span style="color:#555;font-size:12px">to</span>
+          <input type="datetime-local" class="inp" id="endTime" style="flex:1" onchange="updateDuration()">
+        </div>
+        <div class="dur" id="duration">Duration: 60 min</div>
+        <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:#888;cursor:pointer">
+          <input type="checkbox" id="repeat"> Repeat event
+        </label>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="row">
+      <div class="lbl">Location</div>
+      <div class="fld">
+        <input class="inp" id="location" placeholder="Conference room 10">
+        <div style="margin-top:4px"><span class="lnk">+Select Room</span></div>
+      </div>
+    </div>
+
+    <!-- Meeting Mode -->
+    <div class="row">
+      <div class="lbl">Meeting Mode</div>
+      <div class="fld">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="mode-wrap">
+            <button class="mode-btn on" data-mode="Audio" onclick="setMode('Audio')">Audio</button>
+            <button class="mode-btn" data-mode="Video" onclick="setMode('Video')">Video</button>
+          </div>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#888;cursor:pointer">
+            <input type="checkbox" id="record"> Record
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Participants -->
+    <div class="row">
+      <div class="lbl">Participants</div>
+      <div class="fld">
+        <div id="partList"></div>
+        <div style="display:flex;gap:6px">
+          <input class="inp" id="partInput" placeholder="Add email and press Enter" style="flex:1" onkeydown="if(event.key==='Enter')addParticipant()">
+          <button class="btn-out" onclick="addParticipant()" style="padding:6px 12px">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link -->
+    <div class="row">
+      <div class="lbl">Link</div>
+      <div class="fld"><input class="inp" id="link" placeholder="Enter the URL to share with participants"></div>
+    </div>
+
+    <!-- Alert Type -->
+    <div class="row">
+      <div class="lbl">Alert Type</div>
+      <div class="fld">
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <label onclick="setAlert('none')" style="display:flex;align-items:center;gap:5px;font-size:12px;color:#999;cursor:pointer">
+            <span class="radio" data-alert="none"></span> None
+          </label>
+          <label onclick="setAlert('remind')" style="display:flex;align-items:center;gap:5px;font-size:12px;color:#999;cursor:pointer">
+            <span class="radio" data-alert="remind"></span> Remind me
+          </label>
+          <label onclick="setAlert('zia')" style="display:flex;align-items:center;gap:5px;font-size:12px;color:#999;cursor:pointer">
+            <span class="radio on" data-alert="zia"></span> Include Zia
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="row">
+      <div class="lbl">Description</div>
+      <div class="fld">
+        <div class="desc-box">
+          <!-- Toolbar -->
+          <div class="tb">
+            <div style="display:flex;align-items:center" id="tbBtns">
+              <button class="tb-btn" style="font-weight:700">B</button>
+              <button class="tb-btn" style="font-style:italic">I</button>
+              <button class="tb-btn" style="text-decoration:underline">U</button>
+              <button class="tb-btn" style="text-decoration:line-through">S</button>
+              <button class="tb-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><text x="0" y="5" font-size="5" fill="#999" font-family="DM Sans,sans-serif" font-weight="600">1</text><line x1="6" y1="3.5" x2="16" y2="3.5" stroke="#999" stroke-width="1.2"/><text x="0" y="10" font-size="5" fill="#999" font-family="DM Sans,sans-serif" font-weight="600">2</text><line x1="6" y1="8.5" x2="16" y2="8.5" stroke="#999" stroke-width="1.2"/><text x="0" y="15" font-size="5" fill="#999" font-family="DM Sans,sans-serif" font-weight="600">3</text><line x1="6" y1="13.5" x2="16" y2="13.5" stroke="#999" stroke-width="1.2"/></svg>
+              </button>
+              <button class="tb-btn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="2" cy="3.5" r="1.5" fill="#999"/><line x1="6" y1="3.5" x2="16" y2="3.5" stroke="#999" stroke-width="1.2"/><circle cx="2" cy="8.5" r="1.5" fill="#999"/><line x1="6" y1="8.5" x2="16" y2="8.5" stroke="#999" stroke-width="1.2"/><circle cx="2" cy="13.5" r="1.5" fill="#999"/><line x1="6" y1="13.5" x2="16" y2="13.5" stroke="#999" stroke-width="1.2"/></svg>
+              </button>
+            </div>
+            <div class="tb-actions" id="tbActions">
+              <button class="zia" onclick="enterAiMode()">✦ Generate with Zia</button>
+            </div>
+          </div>
+
+          <!-- AI Panel (hidden by default) -->
+          <div class="ai-panel" id="aiPanel" style="display:none">
+            <div class="ai-ctx" id="aiCtx"></div>
+            <div class="ai-prompt-row">
+              <textarea class="ai-prompt" id="aiPrompt" placeholder="e.g. Generate an agenda for reviewing Q2 marketing performance..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}"></textarea>
+              <button class="zia" style="padding:8px 16px;height:52px;border-radius:4px" id="genBtn" onclick="generate()">✦ Generate</button>
+            </div>
+            <div class="err" id="errMsg" style="display:none"></div>
+            <div class="qchip-row" id="templateRow"></div>
+          </div>
+
+          <!-- Description Content -->
+          <div class="desc-content" id="descContent">
+            <textarea class="desc-ta" id="descTA" rows="5" placeholder="Describe what this meeting covers or generate with Zia..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attachments -->
+    <div class="row">
+      <div class="lbl">Attachments</div>
+      <div class="fld">
+        <div id="attList"></div>
+        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(event)">
+        <button class="btn-out" onclick="document.getElementById('fileInput').click()">📎 Add Attachment(s)</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="ftr">
+    <span class="lnk">Advanced ▴</span>
+    <div style="display:flex;gap:8px">
+      <button class="btn-cancel">Cancel</button>
+      <button class="btn-create">Create</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── State ── */
+const state = {
+  meetingType: 'online',
+  meetingMode: 'Audio',
+  alertType: 'zia',
+  participants: ['scott.fisher@zylker.com'],
+  attachments: [],
+  aiMode: false,
+  generated: false,
+  loading: false,
+  description: '',
+  lastPrompt: '',
+};
+
+/* ── System Prompt ── */
+const SYSTEM_PROMPT = `You are an event description assistant for Zoho Meeting.
+
+CONTEXT (auto-injected from form):
+- Event name: {{event_name}}
+- Duration: {{duration_minutes}} minutes
+- Participants: {{participants}}
+- Meeting mode: {{meeting_mode}}
+- Date/Time: {{start_time}} to {{end_time}}
+
+USER PROMPT (if provided): {{user_prompt}}
+
+RULES:
+- Generate a professional event description using Markdown formatting.
+- Use **bold** for headings and key labels (e.g. time slots).
+- Use line breaks between sections.
+- If duration is available, include time-slotted breakdown.
+- Keep total output under 200 words.
+- Use plain, professional tone.
+- Do not invent participant names or external details.
+- Do not include greetings like "Dear team."
+- If user prompt is empty, generate based on event name and context only.
+- If event name is too vague (e.g., "Meeting"), generate a generic structure and add a tip: "Tip: Add a specific event name for a better description."
+
+OUTPUT FORMAT (use markdown):
+**Event Title**
+One-line purpose statement.
+
+**Time Slot** — Topic
+**Time Slot** — Topic
+
+**Next Steps**
+Closing line with action items.`;
+
+/* ── Template Engine ── */
+const BANK = [
+  {kw:["standup","daily","scrum","sync","huddle"],l:"Daily standup",p:"Generate a daily standup meeting agenda with yesterday's progress, today's plan, and blockers"},
+  {kw:["sprint","retro","retrospective"],l:"Sprint retro",p:"Generate a sprint retrospective agenda with what went well, what didn't, and improvements"},
+  {kw:["review","performance","feedback","appraisal"],l:"Performance review",p:"Generate a performance review agenda with goals recap, achievements, and next targets"},
+  {kw:["kickoff","kick-off","launch","onboard","client"],l:"Project kickoff",p:"Generate a kickoff agenda with introductions, scope, timeline, and next steps"},
+  {kw:["brainstorm","ideation","workshop","creative"],l:"Brainstorm session",p:"Generate a brainstorm agenda with warm-up, ideation rounds, and prioritization"},
+  {kw:["marketing","campaign","brand","ads","growth"],l:"Campaign review",p:"Generate a marketing campaign review agenda with metrics, channel breakdown, and planning"},
+  {kw:["sales","pipeline","deal","revenue","forecast"],l:"Sales pipeline",p:"Generate a sales pipeline review agenda with deal updates, forecast, and close plans"},
+  {kw:["product","roadmap","feature","release","backlog"],l:"Product roadmap",p:"Generate a product roadmap review agenda with sprint status and stakeholder alignment"},
+  {kw:["design","ux","ui","figma","prototype"],l:"Design review",p:"Generate a design review agenda with walkthrough, feedback, and finalization"},
+  {kw:["board","investor","quarterly","qbr"],l:"Board / QBR",p:"Generate a QBR agenda with metrics, highlights, risks, and priorities"},
+  {kw:["interview","hiring","candidate","recruit"],l:"Interview debrief",p:"Generate an interview debrief agenda with feedback, scoring, and decision"},
+  {kw:["training","learning","session","course"],l:"Training session",p:"Generate a training agenda with objectives, modules, exercises, and Q&A"},
+  {kw:["1:1","one-on-one","1on1","check-in"],l:"1:1 check-in",p:"Generate a 1:1 check-in agenda with updates, blockers, and career development"},
+  {kw:["planning","plan","strategy","okr","goal"],l:"Planning session",p:"Generate a planning session agenda with OKRs, resource allocation, and timelines"},
+  {kw:["demo","showcase","presentation"],l:"Demo / Showcase",p:"Generate a demo agenda with context, demonstration, Q&A, and feedback"},
+  {kw:["incident","postmortem","outage","issue"],l:"Incident postmortem",p:"Generate a postmortem agenda with timeline, root cause, and prevention actions"},
+];
+const DEFAULTS = [
+  {l:"Team sync",p:"Generate a team sync agenda with updates, decisions, and action items"},
+  {l:"Status update",p:"Generate a status update agenda with progress, blockers, and milestones"},
+  {l:"Decision meeting",p:"Generate a decision meeting agenda with options, pros/cons, and framework"},
+];
+
+function getTemplates() {
+  const name = document.getElementById('name').value.toLowerCase();
+  if (!name.trim()) return DEFAULTS;
+  const m = BANK.filter(t => t.kw.some(k => name.includes(k)));
+  return m.length ? m.slice(0, 4) : DEFAULTS;
+}
+
+/* ── Init ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  now.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0);
+  const end = new Date(now.getTime() + 60 * 60000);
+  document.getElementById('startTime').value = toLocal(now);
+  document.getElementById('endTime').value = toLocal(end);
+  renderParticipants();
+  updateTemplates();
+});
+
+function toLocal(d) { return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
+
+/* ── Form Helpers ── */
+function getDurMin() {
+  const s = new Date(document.getElementById('startTime').value);
+  const e = new Date(document.getElementById('endTime').value);
+  return Math.max(Math.round((e - s) / 60000), 0);
+}
+
+function updateDuration() {
+  document.getElementById('duration').textContent = 'Duration: ' + getDurMin() + ' min';
+}
+
+function setMeetingType(t) {
+  state.meetingType = t;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.toggle('on', b.dataset.type === t));
+  document.getElementById('typeDesc').textContent = t === 'online' ? 'Real-time interaction between remotely located users.' : 'In-person meeting at a physical location.';
+}
+
+function setMode(m) {
+  state.meetingMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+}
+
+function setAlert(a) {
+  state.alertType = a;
+  document.querySelectorAll('.radio').forEach(r => r.classList.toggle('on', r.dataset.alert === a));
+}
+
+function addParticipant() {
+  const inp = document.getElementById('partInput');
+  const email = inp.value.trim();
+  if (email && !state.participants.includes(email)) {
+    state.participants.push(email);
+    inp.value = '';
+    renderParticipants();
+  }
+}
+
+function removeParticipant(email) {
+  state.participants = state.participants.filter(p => p !== email);
+  renderParticipants();
+}
+
+function renderParticipants() {
+  const el = document.getElementById('partList');
+  el.innerHTML = state.participants.map(p =>
+    `<span class="tag">${p} <span class="x" onclick="removeParticipant('${p}')">×</span></span>`
+  ).join('');
+}
+
+function handleFiles(e) {
+  Array.from(e.target.files).forEach(f => {
+    state.attachments.push({ name: f.name, size: (f.size / 1024).toFixed(1) + ' KB' });
+  });
+  renderAttachments();
+}
+
+function removeAttachment(i) {
+  state.attachments.splice(i, 1);
+  renderAttachments();
+}
+
+function renderAttachments() {
+  const el = document.getElementById('attList');
+  el.innerHTML = state.attachments.map((a, i) =>
+    `<span class="tag">📎 ${a.name} <span style="color:#666">(${a.size})</span> <span class="x" onclick="removeAttachment(${i})">×</span></span>`
+  ).join('');
+}
+
+/* ── AI Mode ── */
+function enterAiMode() {
+  state.aiMode = true;
+  document.getElementById('aiPanel').style.display = 'block';
+  document.getElementById('descContent').style.display = 'none';
+  document.getElementById('aiPrompt').value = '';
+  document.getElementById('errMsg').style.display = 'none';
+
+  // Disable toolbar
+  document.querySelectorAll('#tbBtns .tb-btn').forEach(b => b.classList.add('off'));
+
+  // Update actions
+  document.getElementById('tbActions').innerHTML = '<button class="btn-out" onclick="exitAiMode()">✕ Exit</button>';
+
+  // Context line
+  const name = document.getElementById('name').value || 'Untitled';
+  document.getElementById('aiCtx').innerHTML =
+    `<span style="color:#E8413C;margin-right:4px">✦</span>Using: <span>${name}</span> · <span>${state.participants.length} participant${state.participants.length !== 1 ? 's' : ''}</span> · <span>${getDurMin()} min</span> · <span>${state.meetingMode}</span>`;
+
+  updateTemplates();
+  document.getElementById('aiPrompt').focus();
+}
+
+function exitAiMode() {
+  state.aiMode = false;
+  document.getElementById('aiPanel').style.display = 'none';
+  document.getElementById('descContent').style.display = 'block';
+
+  // Re-enable toolbar
+  document.querySelectorAll('#tbBtns .tb-btn').forEach(b => b.classList.remove('off'));
+
+  // Restore actions
+  renderToolbarActions();
+}
+
+function renderToolbarActions() {
+  let html = '';
+  if (state.generated) {
+    html += `<button class="btn-out" onclick="regenerate()">${state.loading ? '...' : '↻ Regenerate'}</button>`;
+  }
+  html += '<button class="zia" onclick="enterAiMode()">✦ Generate with Zia</button>';
+  document.getElementById('tbActions').innerHTML = html;
+}
+
+function updateTemplates() {
+  const temps = getTemplates();
+  const row = document.getElementById('templateRow');
+  row.innerHTML = '<span style="font-size:10px;color:#666;margin-right:2px">Try:</span>' +
+    temps.map(t => `<span class="qchip" onclick="quickGenerate('${t.p.replace(/'/g, "\\'")}')">${t.l}</span>`).join('');
+}
+
+/* ── Markdown → HTML ── */
+function mdToHtml(md) {
+  if (!md) return '';
+  return md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^---$/gm, '<hr/>')
+    .replace(/\n/g, '<br/>')
+    .replace(/(<br\/>){3,}/g, '<br/><br/>');
+}
+
+/* ── Build System Prompt ── */
+function buildSystemPrompt(userPrompt) {
+  const name = document.getElementById('name').value || 'Untitled Meeting';
+  const dur = getDurMin();
+  const parts = state.participants.length ? state.participants.join(', ') : 'Not specified';
+  const startEl = document.getElementById('startTime');
+  const endEl = document.getElementById('endTime');
+  const startStr = startEl.value ? new Date(startEl.value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+  const endStr = endEl.value ? new Date(endEl.value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+  return SYSTEM_PROMPT
+    .replace('{{event_name}}', name)
+    .replace('{{duration_minutes}}', dur)
+    .replace('{{participants}}', parts)
+    .replace('{{meeting_mode}}', state.meetingMode)
+    .replace('{{start_time}}', startStr)
+    .replace('{{end_time}}', endStr)
+    .replace('{{user_prompt}}', userPrompt || 'None');
+}
+
+/* ── Generate ── */
+async function generate(customPrompt) {
+  const prompt = customPrompt || document.getElementById('aiPrompt').value;
+  state.lastPrompt = prompt;
+  state.loading = true;
+
+  const genBtn = document.getElementById('genBtn');
+  genBtn.innerHTML = '<span class="spinner"></span>';
+  genBtn.disabled = true;
+  document.getElementById('errMsg').style.display = 'none';
+
+  const sys = buildSystemPrompt(prompt);
+  const userMsg = prompt || `Generate a professional event description for: ${document.getElementById('name').value || 'this meeting'}`;
+
+  try {
+    const res = await fetch('https://platformai.zoho.in/playground/v2/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'portal_id': 'PlatformAI',
+        'service': '193',
+        'service_org_id': 'PlatformAI',
+      },
+      body: JSON.stringify({
+        context: sys,
+        messages: [{ role: 'user', content: userMsg }],
+        ai_vendor: 'zia',
+        model: 'zlabs-qwen3-4B-v1',
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.data?.results?.[0]) {
+      throw new Error(data.error || 'Generation failed');
+    }
+
+    state.description = data.data.results[0];
+    state.generated = true;
+    state.aiMode = false;
+
+    // Show content
+    document.getElementById('aiPanel').style.display = 'none';
+    document.getElementById('descContent').style.display = 'block';
+    document.getElementById('descContent').innerHTML = `
+      <div class="desc-rich" contenteditable="true">${mdToHtml(state.description)}</div>
+      <div class="zia-footer">
+        <span style="font-size:12px;color:#E8413C">✦</span>
+        <span style="font-size:11px;color:#555">Generated by Zia. Edit freely.</span>
+      </div>
+    `;
+
+    // Re-enable toolbar
+    document.querySelectorAll('#tbBtns .tb-btn').forEach(b => b.classList.remove('off'));
+    renderToolbarActions();
+
+  } catch (err) {
+    document.getElementById('errMsg').textContent = err.message || 'Generation failed. Check console for details.';
+    document.getElementById('errMsg').style.display = 'block';
+    console.error('Platform AI error:', err);
+  }
+
+  state.loading = false;
+  genBtn.innerHTML = '✦ Generate';
+  genBtn.disabled = false;
+}
+
+function quickGenerate(prompt) {
+  document.getElementById('aiPrompt').value = prompt;
+  generate(prompt);
+}
+
+function regenerate() {
+  enterAiMode();
+  if (state.lastPrompt) {
+    document.getElementById('aiPrompt').value = state.lastPrompt;
+  }
+  generate(state.lastPrompt);
+}
+</script>
+
+</body>
+</html>
